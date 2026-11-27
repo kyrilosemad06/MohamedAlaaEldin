@@ -12,7 +12,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B0B0C'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23C9A24B' font-family='sans-serif' font-weight='700'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preload" href="assets/fonts/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/thmanyahsans-Black.woff2" as="font" type="font/woff2" crossorigin>
-<script>try{if(!sessionStorage.getItem("introSeen")&&!matchMedia("(prefers-reduced-motion:reduce)").matches)document.documentElement.classList.add("intro")}catch(e){}</script>
+<script>document.documentElement.classList.add("intro");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
@@ -28,7 +28,6 @@
 html{scroll-behavior:smooth;scroll-padding-top:5rem;-webkit-text-size-adjust:100%;background:var(--bg)}
 html[lang=ar] .en{display:none}
 html[lang=en] .ar{display:none}
-html.intro,html.intro body{overflow:hidden}
 body{font-family:var(--font);font-weight:400;color:var(--text);background:var(--bg);line-height:1.85;font-size:1.0625rem}
 img{max-width:100%;display:block}
 a{color:inherit}
@@ -40,13 +39,15 @@ section{padding-block:clamp(3rem,7vw,5.5rem)}
 .band{background:var(--bg2)}
 
 /* intro */
-#splash{display:none;position:fixed;inset:0;z-index:100;background:#fff;place-items:center;cursor:pointer}
-html.intro #splash{display:grid}
+#splash{position:fixed;inset:0;z-index:100;background:#fff;display:grid;place-items:center;cursor:pointer;animation:curtain .9s 3.4s cubic-bezier(.7,0,.3,1) forwards}
 #splash::after{content:"";position:absolute;inset-inline:0;bottom:0;height:6px;background:linear-gradient(90deg,#8F6B1F,var(--gold-hi),#8F6B1F)}
-#splash img{width:min(620px,82vw);height:auto;clip-path:inset(0 0 0 100%);transform:scale(.96);animation:wipe 1.9s .35s cubic-bezier(.65,0,.35,1) forwards}
+#splash img{width:min(620px,82vw);height:auto;animation:wipe 1.9s .35s cubic-bezier(.65,0,.35,1) both}
 #splash.out{animation:curtain .9s cubic-bezier(.7,0,.3,1) forwards}
-@keyframes wipe{to{clip-path:inset(0 0 0 0);transform:none}}
-@keyframes curtain{to{transform:translateY(-101%)}}
+@keyframes wipe{from{clip-path:inset(0 0 0 100%);transform:scale(.96)}to{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes curtain{to{transform:translateY(-101%);visibility:hidden}}
+@keyframes fadeout{to{opacity:0;visibility:hidden}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#splash{animation:fadeout .5s 2.6s forwards}#splash.out{animation:fadeout .4s forwards}#splash img{animation:fadein .8s .2s both}}
 
 /* header */
 header.top{position:sticky;top:0;z-index:20;background:rgba(11,11,12,.93);backdrop-filter:blur(6px);border-bottom:1px solid var(--gold)}
@@ -73,8 +74,7 @@ nav a:hover{color:var(--gold-hi);text-decoration:underline;text-decoration-color
 .btn.line:hover{background:var(--gold);color:#0B0B0C}
 .screen{position:relative;margin:0 0 2.2rem}
 .screen img{width:100%;aspect-ratio:720/439;object-fit:cover;border:5px solid var(--gold);border-radius:8px;background:#000}
-.l3{position:absolute;inset-inline-start:-1rem;bottom:-1.6rem;max-width:88%;animation:l3in .9s .2s cubic-bezier(.2,.8,.2,1) both}
-html.intro .l3{animation-play-state:paused}
+.l3{position:absolute;inset-inline-start:-1rem;bottom:-1.6rem;max-width:88%;animation:l3in .9s 3.2s cubic-bezier(.2,.8,.2,1) both}
 .l3 b{display:block;background:#000;color:var(--text);font-weight:900;padding:.35rem 1rem;font-size:clamp(.95rem,2vw,1.15rem);border-inline-start:5px solid var(--gold)}
 .l3 span.role{display:block;background:var(--gold);color:#0B0B0C;font-weight:700;padding:.2rem 1rem;font-size:.92rem}
 @keyframes l3in{from{opacity:0;transform:translateX(calc(var(--dx,-1) * 2.5rem))}to{opacity:1;transform:none}}
@@ -309,10 +309,8 @@ dialog#lb button{position:absolute;top:-2.6rem;inset-inline-end:0;background:var
       var done=false;
       var end=function(){
         if(done)return;done=true;sp.classList.add('out');
-        try{sessionStorage.setItem('introSeen','1')}catch(e){}
         setTimeout(function(){root.classList.remove('intro');sp.remove()},900);
       };
-      setTimeout(end,3400);
       sp.addEventListener('click',end);
       document.addEventListener('keydown',end,{once:true});
     }else{sp.remove()}
